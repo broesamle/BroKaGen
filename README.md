@@ -1,7 +1,8 @@
 # BroKaGen
 
 Br:oKaGen - The Br:osamle Katalog Generator
-==========================================
+===========================================
+
 Organise texts, image content, list/item-centred information 
 (such as publications list, curriculum vita, exhibitions, talks, etc.) 
 into a coherent and pleasant form for screen, presentation, print. 
@@ -24,7 +25,6 @@ ToDos and Open Ends
 
 Create a Template Project
 -------------------------
-
 Currently, only the engine is in the repo...
 
 Making a presentation will at some point become more straight forward based on suitable templates:
@@ -34,3 +34,8 @@ Making a presentation will at some point become more straight forward based on s
 	a. Rubriques
 	b. Logos
 3. Define Logo
+
+Clean logging
+-------------
+There should be logging levels so that warnings (i.e. about ignored input files) can be read separately from more general infos. 
+
