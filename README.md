@@ -30,9 +30,8 @@ Currently, only the engine is in the repo...
 Making a presentation will at some point become more straight forward based on suitable templates:
 
 1. Checkout the generator
-2. Adapt the template `CFG_*` files appropriately
-	a. Rubriques
-	b. Logos
+2. Adapt the template `CFG_*` files appropriately (Rubriques, Icons)
+
 3. Define Logo
 
 Clean logging
