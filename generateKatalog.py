@@ -1,9 +1,10 @@
 import os, codecs, time, shutil, re, fnmatch
-from sys import argv
+import sys
 	
 from string import Template
 import MultiTemplateA as MT
 
+sys.path.append(os.getcwd())	# so we can import the CFGs
 from BroKaGen import ArticlesCollection, writeHTMLfile
 
 import CFG_TemplateDefs as TEM
@@ -151,7 +152,7 @@ articles = ArticlesCollection(
 
 # for each field in `one_element_fields` transform lists with only one element `[e]` into stand-alone elements `e`
 one_element_fields = ['title','subtitle','comment','author','date','entrydate','thumbnail','link']+CONTSTRUCT.one_element_fields
-articles.tryReformatFields(,(lambda x:x[0]))
+articles.tryReformatFields(one_element_fields,(lambda x:x[0]))
 articles.tryReformatFields(['thumbnail'],(lambda x:os.path.splitext(x)[0]+'_thumb'+os.path.splitext(x)[1]))
 
 articles.detectDates()
