@@ -7,13 +7,13 @@ try:
     import PIL.Image
     pilOK = True
 except ImportError:
-    print ("WARNING: PIL not Installed!")   
-    pilOK = False   
-    
+    print ("WARNING: PIL not Installed!")
+    pilOK = False
+
 import xml.etree.ElementTree as ET
 import markdown
 
-import ItemsCollectionA as IC
+import PyBroeModules.ItemsCollectionA as IC
 
 from CFG_FilesPaths import indexHTMLwww, indexHTMLlocal
 
@@ -21,7 +21,7 @@ from CFG_FilesPaths import indexHTMLwww, indexHTMLlocal
 ### (I am not the only one to copy this snippet:
 ### https://github.com/Remi-C/PPPP_utilities/blob/master/pointcloud/test_reading_ply_with_python.py)
 class StripNamespace(TreeBuilder):
-    """ Remove Namespace prefixes from the tags. 
+    """ Remove Namespace prefixes from the tags.
         Source: http://stackoverflow.com/questions/8113296/supressing-namespace-prefixes-in-elementtree-1-2
         """
     def start(self, tag, attrib):
@@ -44,7 +44,7 @@ def stripNamespace(content):
     return s.getvalue()
 
 def writeHTMLfile(outFN,documentHTML):
-    print ("HTML-OUT:",outFN) 
+    print ("HTML-OUT:",outFN)
     localDir,filename = os.path.split(outFN)
     os.makedirs(localDir,exist_ok=True)
 
@@ -52,14 +52,14 @@ def writeHTMLfile(outFN,documentHTML):
     output_file.write(documentHTML)
     output_file.close()
 
-    
+
 class RubriqueSet(IC.ItemsCollection):
     def __init__(self):
         IC.ItemsCollection.__init__(self,defaults={'rubriqueNom':"DEFAULTNAME"})
-                
+
     def readSVGContent (self,filename,prefix="ico-",accesKey="iconsvg"):
         ns = {'svg':'http://www.w3.org/2000/svg', 'xlink':"http://www.w3.org/1999/xlink"}
-        
+
         tree = ET.parse(filename)
         root = tree.getroot()
 
@@ -67,28 +67,28 @@ class RubriqueSet(IC.ItemsCollection):
         elementXpath = "svg:g[@id]"
         for el in root.findall(elementXpath, ns):
             print ("SVG element", el.attrib['id'])
-            
+
             if el.attrib['id'][:len(prefix)] == prefix:
                 key = el.attrib['id'][len(prefix):]
-                if key not in self: 
+                if key not in self:
                     print ("Warning. Icon for non-existing rubrique: %s" % key)
-                else:   
+                else:
                     s = io.StringIO()
                     ET.ElementTree(el).write(s,encoding="unicode")
                     self[ key ] [accesKey] = stripNamespace(s.getvalue())
         return viewbox
-        
+
 class ArticlesCollection(IC.FilesInputCollection):
     def __init__(self,debugoutoputDIR="",defaults={'title':"",'subtitle':"",'comment':"",'author':"",'date':"",'vitadate':"",'rubriques':[]},**kwargs):
         self.relativeHRefs = set()
-        
+
         self.md = markdown.Markdown(extensions = ['markdown.extensions.meta'])
         if not debugoutoputDIR:     self.debug = False
         else:                       self.debug = True
         IC.FilesCollection.__init__(self,defaults=defaults,reverse=True,**kwargs)
         #self.rubriques = rubriques
-        
-    
+
+
     def processInput(self,key=None,text=""):
         html =  self.md.reset().convert(text)
         try:
@@ -96,9 +96,9 @@ class ArticlesCollection(IC.FilesInputCollection):
         except Exception as e:
             print ("key of file with empty meta info (or the like):",key)
             raise e
-            
+
         if 'rubriques' not in self[key]: self[key]['rubriques'] = []
-        
+
         self[key]['rubriques'] = list(filter(lambda x:x!='',self[key]['rubriques']))
         self[key]['content'] = html.strip()
         ### generate relative HRef, path, filename for later use
@@ -112,15 +112,15 @@ class ArticlesCollection(IC.FilesInputCollection):
             self[key]['relativeHRef'] = relativeHRef
             self[key]['localDIRrel'] = localDIRrel
             self[key]['localFILErel'] = os.path.join(localDIRrel, indexHTMLlocal)
-            
+
         else:
             raise ValueError("Failed to transform filename into valid local reference: "+key)
-        
+
         if self[key]['relativeHRef'] in self.relativeHRefs:
             raise ValueError("Duplicate Local HReference: ", key, self[key]['relativeHRef'])
 
         self.relativeHRefs.add(self[key]['relativeHRef'])
-        
+
     def detectDates(self):
         for key in self.keys():
             try:
@@ -135,9 +135,9 @@ class ArticlesCollection(IC.FilesInputCollection):
                 self[key]['year'],self[key]['month'],self[key]['day'] = "","",""
                 print ( "WARNING: Date not detected. %s in %s." % (self[key]['date'],key) )
                 print ( e )
-                
+
             if self[key]['vitadate'] == 'None': self[key]['vitadate'] = ''
-            
+
 
 class ImageCollection(IC.FilesCollection):
     def __init__(self, projectRootDIRabs, imageRootDIRrel, htmlRootDIRrel,
@@ -158,19 +158,19 @@ class ImageCollection(IC.FilesCollection):
             inputDIR=os.path.join(projectRootDIRabs,imageRootDIRrel,thisseriesDIRrel),
             defaults=defaults,
             pattern=pattern,**kwargs)
-        
+
     def processFile(self,key,filepath,filename):
         inFN = os.path.join(filepath,filename)
         ext = os.path.splitext(filename)[1][1:]
         self.addItem(key,{'inFN':inFN, 'file_extension':ext, 'htmlFN':self.getHtmlFN(key)})
         for sizekey in self.maxsizes:
             self[key]['imageFN_%s'%sizekey] = self.getImageFN(key,sizekey)
-                    
+
     def generateSlideshowHTMLfiles(self,imageviewTEM,htmlTargetDIRrel,relativeRootHRef,addFields={},slideshowSelection=None):
         if slideshowSelection:  items2process = slideshowSelection
         else:                   items2process = list(self.keys())
         #print ("generateSlideshowHTMLfiles", items2process)
-        
+
         this = items2process[-1]
         next = items2process[0]
         counter = 0
@@ -188,14 +188,14 @@ class ImageCollection(IC.FilesCollection):
                 relativeRootHRef=relativeRootHRef,
                 imagesource=os.path.join(relativeRootHRef,self.imageRootDIRrel,self.getImageFN(this,'full')).replace("\\","/"),
                 **addFields)
-            
+
             absoluteFilename = os.path.join(
                 self.projectRootDIRabs,
                 self.htmlRootDIRrel.replace("\\","/"),
                 htmlTargetDIRrel,
                 self.getHtmlFN(documentdict['THIS_ELEMENT_KEY']))
             print ( "writing image series file" + absoluteFilename )
-            writeHTMLfile ( absoluteFilename , documentHTML )   
+            writeHTMLfile ( absoluteFilename , documentHTML )
 
         counter+=1
         prev = this
@@ -212,16 +212,16 @@ class ImageCollection(IC.FilesCollection):
             imagesource=os.path.join(relativeRootHRef,self.imageRootDIRrel,self.getImageFN(this,'full')).replace("\\","/"),
             **addFields)
         writeHTMLfile ( os.path.join(self.projectRootDIRabs,self.htmlRootDIRrel,htmlTargetDIRrel,self.getHtmlFN(documentdict['THIS_ELEMENT_KEY'])), documentHTML )
-            
+
     def getImageFN (self,key,sizekey):
         return "%s_%s.%s" % (key,sizekey,self[key]['file_extension'])
-        
+
     def getHtmlFN (self,key):
         return key+'.'+self.htmlExt
-                
+
     def generateImageFiles(self,pattern=""):
         """ Pattern currently unused."""
-        if pilOK:           
+        if pilOK:
             outPath = os.path.join(self.projectRootDIRabs,self.htmlRootDIRrel,self.imageRootDIRrel)
             if not os.path.exists(outPath):
                 os.makedirs(outPath)
@@ -232,22 +232,22 @@ class ImageCollection(IC.FilesCollection):
                     im = PIL.Image.open(self[key]['inFN'])
                     im.thumbnail(maxsize, PIL.Image.ANTIALIAS)
                     im.save(outFN,quality=90, optimize=True, progressive=True)
-        else:   
+        else:
             print ("WARNING: PIL not Installed; Images not converted")
 
-            
+
 class Gallery(dict):
     """ Basically a dictionary of imagecollections with some useful paths and presets defined when creating an instance."""
-    
+
     def __init__(self,projectRootDIRabs,imageRootDIRrel,htmlRootDIRrel):
         self.projectRootDIRabs  = projectRootDIRabs
-        self.imageRootDIRrel    = imageRootDIRrel   
-        self.htmlRootDIRrel     = htmlRootDIRrel    
-        
+        self.imageRootDIRrel    = imageRootDIRrel
+        self.htmlRootDIRrel     = htmlRootDIRrel
+
     def addImageCollection(self,key,pattern,path=""):
         """ Quick shorthand for creating an image series with the given configuration."""
-        self[key] = ImageCollection( 
-            projectRootDIRabs   = self.projectRootDIRabs,   
+        self[key] = ImageCollection(
+            projectRootDIRabs   = self.projectRootDIRabs,
             imageRootDIRrel     = self.imageRootDIRrel,
             htmlRootDIRrel      = self.htmlRootDIRrel,
             thisseriesDIRrel    = path,
