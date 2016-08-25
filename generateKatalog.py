@@ -2,10 +2,10 @@ import os, codecs, time, shutil, re, fnmatch
 import sys
 
 from string import Template
-import MultiTemplateA as MT
+import PyBroeModules.MultiTemplateA as MT
 
 sys.path.append(os.getcwd())    # so we can import the CFGs
-from BroKaGen import ArticlesCollection, writeHTMLfile
+from . import ArticlesCollection, writeHTMLfile
 
 import CFG_TemplateDefs as TEM
 import CFG_StyleDefs as CSS
