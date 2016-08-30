@@ -61,6 +61,23 @@ somewhere in the python module path clone/place the following packages:
 
 `git clone https://github.com/broesamle/PyBroeModules.git`
 
+### Windows (10)
+
+Assuming there is a python3 already installed and the interpreter is added to the path.
+
+add `C:\Users\<USER>\local\lib\python3\site-packages\BroKaGen` to PYTHONPATH
+
+(Replace <USER> with your user directory)
+
+`git clone https://github.com/broesamle/BroKaGen.git`
+
+`git clone https://github.com/broesamle/PyBroeModules.git`
+
+as Administrator:
+
+`python -m pip install markdown`
+
+`python -m pip install pillow`
 
 ToDos and Open Ends
 -------------------
