@@ -183,8 +183,12 @@ for articleKey, articleDict in articles.items():
             previews4entryHTML += sep + previewitemsHTML
             sep = """<div class="imageseries-sep">&nbsp;</div>"""
 
+
+            ## TODO: Test on windows:
+            _htTargrel = os.path.join ( *[ pel for pel in articleDict['relativeHRef'].split("/")]  )
+            print("Relative target directory:", _htTargrel, "derived from", articleDict['relativeHRef'])
             IMG.collections[imgserKey].generateSlideshowHTMLfiles(TEM.ImageFullsize,
-                htmlTargetDIRrel=os.path.split(articleDict['relativeHRef'])[0].replace('/','\\'),
+                htmlTargetDIRrel=_htTargrel,
                 relativeRootHRef=articleLocalRootHRef,
                 addFields={'preview':imageselectorHTML,'backlinkHref':PATHS.indexHTMLwww,'navigator':"NAV",'rubriquespecCSS':""},slideshowSelection=None)
 
