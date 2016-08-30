@@ -159,6 +159,7 @@ def firstThree(i):
 
 for articleKey, articleDict in articles.items():
     previews4entryHTML = ""
+    relativeArticleHRef = os.path.join ( *[ pel for pel in articleDict['relativeHRef'].split("/")]  )
     print ( "PROCESSING:", articleKey, articleDict['localFILErel'])
 
     ### detect and replace imageseries
@@ -183,14 +184,10 @@ for articleKey, articleDict in articles.items():
             previews4entryHTML += sep + previewitemsHTML
             sep = """<div class="imageseries-sep">&nbsp;</div>"""
 
-
-            ## TODO: Test on windows:
-            _htTargrel = os.path.join ( *[ pel for pel in articleDict['relativeHRef'].split("/")]  )
-            print("Relative target directory:", _htTargrel, "derived from", articleDict['relativeHRef'])
             IMG.collections[imgserKey].generateSlideshowHTMLfiles(TEM.ImageFullsize,
-                htmlTargetDIRrel=_htTargrel,
+                htmlTargetDIRrel=relativeArticleHRef,
                 relativeRootHRef=articleLocalRootHRef,
-                addFields={'preview':imageselectorHTML,'backlinkHref':PATHS.indexHTMLwww,'navigator':"NAV",'rubriquespecCSS':""},slideshowSelection=None)
+                addFields={'preview':imageselectorHTML,'backlinkHref':"./"+PATHS.indexHTMLwww,'navigator':"NAV",'rubriquespecCSS':""},slideshowSelection=None)
 
             imgseriesHTML = IMG.collections[imgserKey].generateSeries(
                 itemTEM=Template(TEM.ImageSeries_Thumbnail),
@@ -217,8 +214,8 @@ for articleKey, articleDict in articles.items():
         else: imagecaption = m.group(5)
 
         singleimageHTML = """<figure><a href="%s">
-    <img class="med-max" src="%s/%s/%s_medium%s" /></a>
-    <figcaption>%s</figcaption></figure>""" % ( imgKey+'.'+PATHS.htmlEXT, articleLocalRootHRef,
+            <img class="med-max" src="%s/%s/%s_medium%s" /></a>
+            <figcaption>%s</figcaption></figure>""" % ( imgKey+'.'+PATHS.htmlEXT, articleLocalRootHRef,
         PATHS.imagetargetDIR, imgKey, imgExt, imagecaption)
 
         imagessourceHTML = "%s/%s/%s_full%s" % (articleLocalRootHRef,PATHS.imagetargetDIR,imgKey,imgExt)
@@ -226,8 +223,8 @@ for articleKey, articleDict in articles.items():
             imagesource=imagessourceHTML,
             author=CONTSTRUCT.author,
             relativeRootHRef=articleLocalRootHRef,
-            backlinkHref=PATHS.indexHTMLwww,
             nextImageHref="",
+            backlinkHref="./"+PATHS.indexHTMLwww,
             title="+")
         writeHTMLfile(os.path.join(targetDIRabs,articleDict['localDIRrel'],imgKey+'.'+PATHS.htmlEXT),imageFullSizeDocumentHTML)
 
@@ -241,7 +238,8 @@ for articleKey, articleDict in articles.items():
     else:                       linkHTML = ""
 
     if 'thumbnail' in articleDict:
-        thumbnailHTML = """<img class="mainentrythumbnail" src="../%s/%s" />""" % (PATHS.imagetargetDIR,articleDict['thumbnail'])
+        thumbnailHTML = """<a href="../%s"><img class="mainentrythumbnail" src="../%s/%s" /></a>""" % \
+                (articleDict['relativeHRef'],PATHS.imagetargetDIR,articleDict['thumbnail'])
     else:
         thumbnailHTML = ""
 
