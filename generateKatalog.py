@@ -255,6 +255,7 @@ for articleKey, articleDict in articles.items():
         needlesHTML = CONTSTRUCT.rubriques.generateSeries(
             itemTEM=TEM.fixedNeedle,
             filterFn=(lambda k:k['THIS_ELEMENT_KEY'] in articleDict['rubriques']) )
+        #needlesHTML = ""
 
         infoblockHTML = TEM.ArticleInfoblock.safe_substitute(articleDict)
 
@@ -303,7 +304,8 @@ for key, dict in articles.items():
 print ("processing Main Catalog")
 selection = set(["event","vita","prozess","ikonen","leerverkauf","pub","training","auftrag"])
 
-needlesHTML = TEM.leftMasterNeedle + CONTSTRUCT.rubriques.generateSeries(itemTEM=TEM.fixedNeedle)
+#needlesHTML = TEM.leftMasterNeedle + CONTSTRUCT.rubriques.generateSeries(itemTEM=TEM.fixedNeedle)
+needlesHTML = ""
 
 navHTML = CONTSTRUCT.rubriques.generateSeries(
     itemTEM=Template(TEM.NavigatorElement),
@@ -366,7 +368,8 @@ for key,dict in CONTSTRUCT.rubriques.items():
 #       seriesData={'navclass':"compact"},
         filterFn=lambda k:(k['THIS_ELEMENT_KEY'] == key) )
 
-    needlesHTML = TEM.leftMasterNeedle + CONTSTRUCT.rubriques.generateSeries ( itemTEM=TEM.fixedNeedle )
+    #needlesHTML = TEM.leftMasterNeedle + CONTSTRUCT.rubriques.generateSeries ( itemTEM=TEM.fixedNeedle )
+    needlesHTML = ""
     navHTML = CONTSTRUCT.rubriques.generateSeries(
         itemTEM=Template(TEM.NavigatorElement),
         seriesTEM=Template(TEM.Navigator_withSelectedItems),
