@@ -26,6 +26,80 @@ def writeHTMLfile(outFN,documentHTML):
     output_file.write(documentHTML)
     output_file.close()
 
+class MDFilesCollection(IC.FilesInputCollection):
+    def __init__(self,*args,**kwargs):
+        self.md = markdown.Markdown(extensions = ['markdown.extensions.meta'])
+        IC.FilesCollection.__init__(self,*args, reverse=True,**kwargs)
+
+    def processInput(self,key=None,text=""):
+        html =  self.md.reset().convert(text)
+        try:
+            self.addItem(key,self.md.Meta)
+        except Exception as e:
+            print ("key of file with empty meta info (or the like):",key)
+            raise e
+
+        self[key]['contentHTML'] = html.strip()
+
+    def iterateSeries(self,
+                      template="PUT SOMETEPLATE FOR $THIS_ELEMENT_KEY: $contentHTML",
+                      prevlinktemplate=Template("$PREV_ELEMENT_KEY"),
+                      nextlinktemplate=Template("$NEXT_ELEMENT_KEY"),
+                      prevlink_forfirst="",
+                      nextlink_forlast=""):
+
+        return LinkedSeriesIterator(self, template,
+                                    prevlinktemplate, nextlinktemplate,
+                                    prevlink_forfirst, nextlink_forlast)
+
+class LinkedSeriesIterator(object):
+    def __init__(self,
+                 collection,
+                 template,
+                 prevlinktemplate,
+                 nextlinktemplate,
+                 prevlink_forfirst,
+                 nextlink_forlast):
+        self.template = template
+        self.collection_iterator = collections.keys()
+        self.backlink = backlinkforfirst
+        self.prevkey = ""
+        try:
+            self.thiskey = self.collection.__next__()
+        except StopIteration:
+            self.thiskey = None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if not self.thiskey: raise StopIteration
+        try:
+            self.nextkey = self.collection.__next__()
+        except StopIteration:
+            self.nextkey = None
+
+        if self.prevkey:
+            prev_link = self.prevlinktemplate.substitute(self.prevkey)
+        else:
+            prev_link = self.prevlink_forfirst
+
+        if self.nextkey:
+            next_link = self.nextlinktemplate.substitute(self.nextkey)
+        else:
+            next_link = self.nextlink_forlast
+
+        next_element_link = self.nextlinktemplate.substitute(self.nextkey)
+        result = self.template.substitute(
+            self.collection[self.thiskey],
+            PREV_ELEMENT_KEY=self.prevkey,
+            THIS_ELEMENT_KEY=self.thiskey,
+            NEXT_ELEMENT_KEY=self.nextkey,
+            PREV_LINK=next_link,
+            NEXT_LINK=prev_link)
+        self.prevkey = self.thiskey
+        self.thiskey = self.nextkey
+
 
 class RubriqueSet(IC.ItemsCollection):
     def __init__(self):
