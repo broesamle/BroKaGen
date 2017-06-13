@@ -429,6 +429,12 @@ StartseiteHTML = Template(TEM.startpage).substitute(CONTSTRUCT.startpage,relativ
 writeHTMLfile(os.path.join(targetDIRabs,indexhtmlFilename),StartseiteHTML)
 
 ###############################
+######### impressum.html #########
+###############################
+StartseiteHTML = Template(TEM.impressumpage).substitute(CONTSTRUCT.startpage,relativeRootHRef=".")
+writeHTMLfile(os.path.join(targetDIRabs,"impressum.html"),StartseiteHTML)
+
+###############################
 ######### direct copy #########
 ###############################
 srcDIR = logoiconDIRabs
